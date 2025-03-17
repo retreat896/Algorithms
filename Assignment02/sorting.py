@@ -21,6 +21,7 @@ def insertionSort(arr):
 
 # Output the whole array after each swap occurs
 def selectionSort(arr):
+    for ()
     return False
 
 
