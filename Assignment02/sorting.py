@@ -21,8 +21,17 @@ def insertionSort(arr):
 
 # Output the whole array after each swap occurs
 def selectionSort(arr):
-    for ()
-    return False
+    print(','.join(str(x) for x in arr))
+    for i in range(len(arr)):
+        smallesti = i
+        for j in range(i+1, len(arr)):
+            if arr[j] < arr[smallesti]:
+                smallesti = j
+        if smallesti != i:
+            #swap
+            arr[smallesti], arr[i] = arr[i], arr[smallesti]
+            print(','.join(str(x) for x in arr))
+    return ','.join(str(x) for x in arr) #still return the sorted array for gradescope happiness
 
 
 # Output the whole array after each swap occurs
@@ -30,13 +39,65 @@ def selectionSort(arr):
 # Always choose the first element of the sub-array as the pivot element.
 # WILL NOT WORK IN GRADESCOPE
 def quickSort(arr):
+
     return False
 
+
+def merge(arr, left, middle, right):
+    leftSize = middle - left + 1
+    rightSize = right - middle
+    leftArr = []
+    rightArr = []
+
+    for i in range(leftSize):
+        leftArr.append(arr[left + i])
+    for i in range(rightSize):
+        rightArr.append(arr[middle + 1 + i])
+
+    leftI = 0
+    rightI = 0
+    valueI = left
+
+    while leftI < leftSize and rightI < rightSize:
+        if leftArr[leftI] <= rightArr[rightI]:
+            arr[valueI] = leftArr[leftI]
+            leftI += 1
+        else:
+            arr[valueI] = rightArr[rightI]
+            rightI += 1
+        valueI += 1
+
+    while leftI < leftSize:
+        arr[valueI] = leftArr[leftI]
+        leftI += 1
+        valueI += 1
+    
+    while rightI < rightSize:
+        arr[valueI] = rightArr[rightI]
+        rightI += 1
+        valueI += 1
+
+    # might need to delete arrays here but this is not C++
+    return arr
 
 # Output the whole array after each merge function is called
 # The left half of the sub-array will contain any extra elements for non-even splits.
-def mergeSortRecursive(arr):
-    return False
+def mergeSortRecursive(arr, left, right, isRecursiveCall=True):
+    print(','.join(str(x) for x in arr))
+    if left < right:
+        middle = left + (right - left) // 2
+
+        mergeSortRecursive(arr, left, middle, True)
+        mergeSortRecursive(arr, middle + 1, right, True)
+
+        #merge here
+        arr = merge(arr, left, middle, right)
+    
+    if(isRecursiveCall == True):
+        
+        return arr
+    print(','.join(str(x) for x in arr))
+    return ','.join(str(x) for x in arr)
 
 
 # CHALLENGE PROBLEM
@@ -72,11 +133,11 @@ if __name__ == "__main__":
     if algorithm == 1:
         print(insertionSort(arr)+" ") # why does gradescope need a space???????
     elif algorithm == 2:
-        selectionSort(arr)
+        print(selectionSort(arr)+" ")
     elif algorithm == 3:
-        quickSort(arr)
+        print(quickSort(arr)+" ")
     elif algorithm == 4:    
-        mergeSortRecursive(arr)
+       print(mergeSortRecursive(arr, 0, len(arr)-1, False)+" ")
     elif algorithm == 5:
         mergeSortIterative(arr)
 
