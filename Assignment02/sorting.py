@@ -1,31 +1,30 @@
 import sys
 
 
+def arrayToString(arr):
+    return ",".join(str(x) for x in arr)
+
+
 # Output the whole array after each element is placed
 def insertionSort(arr):
     i, j, key = 0, 0, 0
-    print(",".join(str(x) for x in arr))
+    print(arrayToString(arr))
     for i in range(1, len(arr)):
         key = arr[i]
         j = i - 1
 
-        # Move elements of values[0..i-1],
-        # that are greater than key, to one
-        # position ahead of their current position
         while j >= 0 and arr[j] > key:
             arr[j + 1] = arr[j]
             j = j - 1
 
         arr[j + 1] = key
-        print(",".join(str(x) for x in arr))
-    return ",".join(
-        str(x) for x in arr
-    )  # return the sorted array to appease the gradescope gods
+        print(arrayToString(arr))
+    return arrayToString(arr)  # return the sorted array to appease the gradescope gods
 
 
 # Output the whole array after each swap occurs
 def selectionSort(arr):
-    print(",".join(str(x) for x in arr))
+    print(arrayToString(arr))
     for i in range(len(arr)):
         smallesti = i
         for j in range(i + 1, len(arr)):
@@ -34,46 +33,43 @@ def selectionSort(arr):
         if smallesti != i:
             # swap
             arr[smallesti], arr[i] = arr[i], arr[smallesti]
-            print(",".join(str(x) for x in arr))
-    return ",".join(
-        str(x) for x in arr
-    )  # still return the sorted array for gradescope happiness
+            print(arrayToString(arr))
+    return arrayToString(arr)  # still return the sorted array for gradescope happiness
 
-
-def swap(leftArr, rightArr):
-    
-
-
+#pivot 
 def partition(arr, start, end):
-    pivot = arr[start]
+    pivot = arr[end]
     left = start - 1
-    right = end + 1
 
-    while True:
-        while arr[left] < pivot:
+    for i in range(start, end):
+        if arr[i] <= pivot:
             left += 1
-        while arr[right] > pivot:
-            right -= 1
-        if left >= right:
-            return right
-        
-        swap(arr[left], arr[right])
-        return arr
+            # swap here
+            arr[left], arr[i] = arr[i], arr[left]
+            print(arrayToString(arr))
+
+    arr[left + 1], arr[end] = arr[end], arr[left + 1]
+    print(arrayToString(arr))
+    return left + 1
 
 
 # Output the whole array after each swap occurs
 # Output the whole array after each pivot is placed
 # Always choose the first element of the sub-array as the pivot element.
 # WILL WORK IN GRADESCOPE
-def quickSortGS(arr, low, high, arraySize):
+def quickSortGS(arr, low, high):
     if low < high:
-        part = 
+        pivot = partition(arr, low, high)
+        quickSortGS(arr, low, pivot - 1)
+        quickSortGS(arr, pivot + 1, high)
+        
+    return arrayToString(arr)
 
-    return False
 
 # Output the whole array after each swap occurs
 # Output the whole array after each pivot is placed
 # Always choose the first element of the sub-array as the pivot element.
+# HOARE's partition Method
 # WILL NOT WORK IN GRADESCOPE
 def quickSort(arr):
 
@@ -113,7 +109,7 @@ def merge(arr, left, middle, right):
         arr[valueI] = rightArr[rightI]
         rightI += 1
         valueI += 1
-    
+
     # might need to delete arrays here but this is not C++
     return arr
 
@@ -129,11 +125,9 @@ def mergeSortRecursive(arr, left, right, isRecursiveCall=True):
 
         # merge here
         arr = merge(arr, left, middle, right)
-        print(",".join(str(x) for x in arr))
+        print(arrayToString(arr))
 
-    if isRecursiveCall == True:
-        return arr
-    return ",".join(str(x) for x in arr)
+    return arrayToString(arr)
 
 
 # CHALLENGE PROBLEM
@@ -171,11 +165,12 @@ if __name__ == "__main__":
     elif algorithm == 2:
         print(selectionSort(arr) + " ")
     elif algorithm == 3:
-        print(quickSortGS(arr) + " ")
+        length = len(arr)
+        print(quickSortGS(arr, 0, length-1) + " ")
     elif algorithm == 4:
-        print(",".join(str(x) for x in arr))
+        print(arrayToString(arr))
         print(mergeSortRecursive(arr, 0, len(arr) - 1, False) + " ")
     elif algorithm == 5:
         print(mergeSortIterative(arr, 0, len(arr) - 1, False) + " ")
-    elif algorithm ==6:
+    elif algorithm == 6:
         print(quickSort(arr) + " ")
