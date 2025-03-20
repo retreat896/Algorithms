@@ -1,6 +1,6 @@
 import sys
 
-
+#print the array like gradescope wants it
 def arrayToString(arr):
     return ",".join(str(x) for x in arr)
 
@@ -134,7 +134,20 @@ def mergeSortRecursive(arr, left, right, isRecursiveCall=True):
 # Implement Merge Sort iteratively.
 # Output the whole array after each merge function is called
 # The left half of the sub-array will contain any extra elements for non-even splits.
-def mergeSortIterative(arr,):
+def mergeSortIterative(arr):
+    size = 1
+    while size <= len(arr)-1:
+        left = 0
+        while left < len(arr)-1:
+            mid = min(left + size-1, len(arr)-1)
+            right = min(left + 2 * size-1, len(arr)-1)
+            merge(arr, left, mid, right)
+            print(arrayToString(arr))
+            left += 2 * size
+        size = 2 * size
+
+    print(arrayToString(arr))        
+    return arrayToString(arr)
     return False
 
 
@@ -171,6 +184,6 @@ if __name__ == "__main__":
         print(arrayToString(arr))
         print(mergeSortRecursive(arr, 0, len(arr) - 1, False) + " ")
     elif algorithm == 5:
-        print(mergeSortIterative(arr, 0, len(arr) - 1, False) + " ")
+        print(mergeSortIterative(arr))
     elif algorithm == 6:
         print(quickSort(arr) + " ")
