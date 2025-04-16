@@ -13,10 +13,47 @@ def get_csv():
             print("File not found or not a CSV. Please try again.")
 
 
-def greedy():
+def greedy(values, weights, capacity):
+    # Calculate the maximum value of fractional knapsack problem.
+    # value: list of n items
+    # weight: list of weights of items
+    # capacity: maximum weight capacity of the knapsack
+    # n: number of items
+
+    n = len(values)
+    value_per_weight = []
+    for i in range(n):
+        value_per_weight.append((values[i] / weights[i], i))
+    value_per_weight.sort(reverse=True, key=lambda x: x[0])
+    total_value = 0
+    fractions = [0] * n
+
+    for weight, i in value_per_weight:
+        if weights[i] <= capacity:
+            fractions[i] = 1
+            total_value += values[i]
+            capacity -= weights[i]
+        else:
+            fractions[i] = capacity / weights[i]
+            total_value += values[i] * fractions[i]
+            break
+    
+    return total_value, fractions
+
 
     return
 
+def maxSubSum():
+
+    return
+
+def topDown():
+
+    return
+
+def knapsack():
+
+    return
 
 def main():
     # Get what porblem the user wants to solve
@@ -54,23 +91,32 @@ def main():
             try:
                 if(problem == '1'):
                     # Line 1: value
+                    value = list(map(int, data[0]))
                     # Line 2: weight
+                    weight = list(map(int, data[1]))
                     # Line 3: capacity
-                    greedy()
+                    capacity = int(data[2][0])
+
+                    total_value, fractions = greedy(value, weight, capacity)
+                    print(f"Total value: {total_value}")
+                    print(f"Fractions: {fractions}")
                 elif(problem == '2'):
                     # Line 1: array of numbers
-                    greedy()
+                    numbers = list(map(int, data[0]))
                 elif(problem == '3'):
                     # Line 1: Target sum
+                    target = int(data[0][0])
                     # Line 2: Array of coin values
-                    greedy()
+                    coins = list(map(int, data[1]))
+                    
                 elif(problem == '4'):
                     # Line 1: value
+                    value = list(map(int, data[0]))
                     # Line 2: weight
+                    weight = list(map(int, data[1]))
                     # Line 3: capacity
-                    greedy()
-                
-                greedy()
+                    capacity = int(data[2][0])
+
             except Exception as e:
                 print(f"Error processing {filename}: {e}")
     return
