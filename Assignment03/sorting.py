@@ -41,7 +41,7 @@ def greedy(values, weights, capacity):
     return total_value, fractions
 
 
-def max_crossing_sum(arr, left, mid, right):
+def cross(arr, left, mid, right):
     # left
     left_sum = float('-inf')
     total = 0
@@ -65,12 +65,31 @@ def max_subarray_sum(arr, left, right):
     mid = (left + right) // 2
     left_max = max_subarray_sum(arr, left, mid)
     right_max = max_subarray_sum(arr, mid + 1, right)
-    cross_max = max_crossing_sum(arr, left, mid, right)
+    cross_max = cross(arr, left, mid, right)
 
     return max(left_max, right_max, cross_max)
-def topDown():
+def coin_change(coins, amount):
+    memo = [-1] * (amount + 1)
 
-    return
+    def F(S):
+        # Base cases
+        if S < 0:
+            return -1
+        if S == 0:
+            return 0
+        if memo[S] != -1:
+            return memo[S]
+
+        minNumberCoin = float('inf')
+        for C in coins:
+            result = F(S - C)
+            if result >= 0 and result < minNumberCoin:
+                minNumberCoin = 1 + result
+
+        memo[S] = -1 if minNumberCoin == float('inf') else minNumberCoin
+        return memo[S]
+
+    return F(amount)
 
 def knapsack():
 
@@ -145,7 +164,7 @@ def main():
                     # Line 2: Array of coin values
                     coins = list(map(int, data[1]))
                     print(f"Valid Output: {data2}")
-                    
+                    # topDown(coins, target)
                 elif(problem == '4'):
                     # Line 1: value
                     value = list(map(int, data[0]))
