@@ -41,12 +41,33 @@ def greedy(values, weights, capacity):
     return total_value, fractions
 
 
-    return
+def max_crossing_sum(arr, left, mid, right):
+    # left
+    left_sum = float('-inf')
+    total = 0
+    for i in range(mid, left - 1, -1):
+        total += arr[i]
+        left_sum = max(left_sum, total)
 
-def maxSubSum():
+    # right
+    right_sum = float('-inf')
+    total = 0
+    for i in range(mid + 1, right + 1):
+        total += arr[i]
+        right_sum = max(right_sum, total)
 
-    return
+    return left_sum + right_sum
 
+def max_subarray_sum(arr, left, right):
+    if left == right:
+        return arr[left]
+
+    mid = (left + right) // 2
+    left_max = max_subarray_sum(arr, left, mid)
+    right_max = max_subarray_sum(arr, mid + 1, right)
+    cross_max = max_crossing_sum(arr, left, mid, right)
+
+    return max(left_max, right_max, cross_max)
 def topDown():
 
     return
@@ -59,6 +80,7 @@ def main():
     # Get what porblem the user wants to solve
     problem = input("Which problem do you want to solve? (1:Greedy, 2:maxSubSum, 3:TopDown, 4:Knapsack): ").strip()
     folder_path = ""
+    output_path = ""
 
     if problem not in ['1', '2', '3', '4']:
         print("Invalid choice. Please enter 1, 2, 3, or 4.")
@@ -66,15 +88,19 @@ def main():
     
     if(problem == '1'):
         folder_path = "./TestCases/Problem1/input_files/"
+        output_path = "./TestCases/Problem1/output/"
 
     elif(problem == '2'):
         folder_path = "./TestCases/Problem2/input_files/"
+        output_path = "./TestCases/Problem2/output/"
 
     elif(problem == '3'):
         folder_path = "./TestCases/Problem3/input_files/"
+        output_path = "./TestCases/Problem3/output/"
 
     elif(problem == '4'):
         folder_path = "./TestCases/Problem4/input_files/"
+        output_path = "./TestCases/Problem4/output/"
 
     if not os.path.isdir(folder_path):
         print("Folder not found.")
@@ -89,6 +115,10 @@ def main():
                 reader = csv.reader(csvfile)
                 data = [row for row in reader]
             try:
+                with open(os.path.join(output_path, filename[:-4]+".txt"), newline='') as csvfile:
+                    reader2 = csv.reader(csvfile)
+                    data2 = next(reader2)[0]
+
                 if(problem == '1'):
                     # Line 1: value
                     value = list(map(int, data[0]))
@@ -100,14 +130,21 @@ def main():
                     total_value, fractions = greedy(value, weight, capacity)
                     print(f"Total value: {total_value}")
                     print(f"Fractions: {fractions}")
+
+                    print(f"Valid Output: {data2}")
                 elif(problem == '2'):
                     # Line 1: array of numbers
+                    
                     numbers = list(map(int, data[0]))
+                    max_subarray_sum_result = max_subarray_sum(numbers, 0, len(numbers) - 1)
+                    print(f"Numbers: {max_subarray_sum_result}")
+                    print(f"Valid Output: {data2}")
                 elif(problem == '3'):
                     # Line 1: Target sum
                     target = int(data[0][0])
                     # Line 2: Array of coin values
                     coins = list(map(int, data[1]))
+                    print(f"Valid Output: {data2}")
                     
                 elif(problem == '4'):
                     # Line 1: value
@@ -116,6 +153,7 @@ def main():
                     weight = list(map(int, data[1]))
                     # Line 3: capacity
                     capacity = int(data[2][0])
+                    print(f"Valid Output: {data2}")
 
             except Exception as e:
                 print(f"Error processing {filename}: {e}")
