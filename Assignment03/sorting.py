@@ -1,5 +1,6 @@
 import os
 import csv
+import argparse
 
 def get_csv():
     while True:
@@ -26,19 +27,16 @@ def greedy(values, weights, capacity):
         value_per_weight.append((values[i] / weights[i], i))
     value_per_weight.sort(reverse=True, key=lambda x: x[0])
     total_value = 0
-    fractions = [0] * n
 
     for weight, i in value_per_weight:
         if weights[i] <= capacity:
-            fractions[i] = 1
             total_value += values[i]
             capacity -= weights[i]
         else:
-            fractions[i] = capacity / weights[i]
-            total_value += values[i] * fractions[i]
+            total_value += values[i] * (capacity / weights[i])
             break
     
-    return total_value, fractions
+    return total_value
 
 
 def cross(arr, left, mid, right):
@@ -68,7 +66,7 @@ def max_subarray_sum(arr, left, right):
     cross_max = cross(arr, left, mid, right)
 
     return max(left_max, right_max, cross_max)
-def coin_change(coins, amount):
+def top_down(coins, amount):
     memo = [-1] * (amount + 1)
 
     def F(S):
@@ -82,6 +80,9 @@ def coin_change(coins, amount):
 
         minNumberCoin = float('inf')
         for C in coins:
+            # solves 8.csv causing infinite recursion
+            if C==0:
+                continue
             result = F(S - C)
             if result >= 0 and result < minNumberCoin:
                 minNumberCoin = 1 + result
@@ -91,18 +92,39 @@ def coin_change(coins, amount):
 
     return F(amount)
 
-def knapsack():
+def knapsack(values, weights, capacity):
+    n = len(values)
+    
+    # Initialize memo table with zeros
+    memo = [[0 for _ in range(capacity + 1)] for _ in range(n + 1)]
 
-    return
+    # Build the memo table bottom-up
+    for i in range(1, n + 1):
+        for w in range(capacity + 1):
+            if weights[i - 1] > w:
+                memo[i][w] = memo[i - 1][w]
+            else:
+                memo[i][w] = max(memo[i - 1][w], memo[i - 1][w - weights[i - 1]] + values[i - 1])
 
-def main():
+    return memo[n][capacity]
+
+def print_result(result):
+    if result % 1 == 0:
+        print("{:.0f}".format(result))
+    else:
+        print("{:.4f}".format(result))
+
+
+def main(problem=None, args=None):
     # Get what porblem the user wants to solve
-    problem = input("Which problem do you want to solve? (1:Greedy, 2:maxSubSum, 3:TopDown, 4:Knapsack): ").strip()
+    problem = problem.strip() if problem else None
+    if problem is None:
+        problem = input("Which problem do you want to solve? (1:Greedy, 2:maxSubSum, 3:TopDown, 4:Knapsack, 5:RUN ALL PROBLEMS): ").strip()
     folder_path = ""
     output_path = ""
 
-    if problem not in ['1', '2', '3', '4']:
-        print("Invalid choice. Please enter 1, 2, 3, or 4.")
+    if problem not in ['1', '2', '3', '4', '5']:
+        print("Invalid choice. Please enter 1, 2, 3, 4, or 5.")
         return
     
     if(problem == '1'):
@@ -121,64 +143,97 @@ def main():
         folder_path = "./TestCases/Problem4/input_files/"
         output_path = "./TestCases/Problem4/output/"
 
-    if not os.path.isdir(folder_path):
-        print("Folder not found.")
+    elif(problem == '5'):
+        print("Running all problems...")
+        print("Problem 1")
+        main('1')
+        print("------------------------------------------------------------------------------")
+        print("Problem 2")
+        main('2')
+        print("------------------------------------------------------------------------------")
+        print("Problem 3")
+        main('3')
+        print("------------------------------------------------------------------------------")
+        print("Problem 4")
+        main('4')
+        
         return
 
-    # Loop through all CSV files in the folder
-    for filename in os.listdir(folder_path):
-        if filename.lower().endswith('.csv'):
-            file_path = os.path.join(folder_path, filename)
-            print(f"\nProcessing file: {filename}")
-            with open(file_path, newline='') as csvfile:
-                reader = csv.reader(csvfile)
-                data = [row for row in reader]
-            try:
-                with open(os.path.join(output_path, filename[:-4]+".txt"), newline='') as csvfile:
-                    reader2 = csv.reader(csvfile)
-                    data2 = next(reader2)[0]
+        
 
-                if(problem == '1'):
-                    # Line 1: value
-                    value = list(map(int, data[0]))
-                    # Line 2: weight
-                    weight = list(map(int, data[1]))
-                    # Line 3: capacity
-                    capacity = int(data[2][0])
+    if args and args.file:
+        # Use single file override
+        file_list = [args.file]
+    else:
+        # Use all .csv files in the folder
+        file_list = [
+            os.path.join(folder_path, f)
+            for f in os.listdir(folder_path)
+            if f.lower().endswith('.csv')
+        ]
 
-                    total_value, fractions = greedy(value, weight, capacity)
-                    print(f"Total value: {total_value}")
-                    print(f"Fractions: {fractions}")
+    for file_path in file_list:
+        filename = os.path.basename(file_path)
+        print(f"\nProcessing file: {filename}")
+        
+        with open(file_path, newline='') as csvfile:
+            reader = csv.reader(csvfile)
+            data = [row for row in reader]
+        
+        try:
+            # if args and args.output:
+            #     valid_output_path = args.output
+            # else:
+            #     
+            valid_output_path = os.path.join(output_path, filename[:-4] + ".txt")
 
-                    print(f"Valid Output: {data2}")
-                elif(problem == '2'):
-                    # Line 1: array of numbers
-                    
-                    numbers = list(map(int, data[0]))
-                    max_subarray_sum_result = max_subarray_sum(numbers, 0, len(numbers) - 1)
-                    print(f"Numbers: {max_subarray_sum_result}")
-                    print(f"Valid Output: {data2}")
-                elif(problem == '3'):
-                    # Line 1: Target sum
-                    target = int(data[0][0])
-                    # Line 2: Array of coin values
-                    coins = list(map(int, data[1]))
-                    print(f"Valid Output: {data2}")
-                    # topDown(coins, target)
-                elif(problem == '4'):
-                    # Line 1: value
-                    value = list(map(int, data[0]))
-                    # Line 2: weight
-                    weight = list(map(int, data[1]))
-                    # Line 3: capacity
-                    capacity = int(data[2][0])
-                    print(f"Valid Output: {data2}")
+            with open(valid_output_path, newline='') as csvfile:
+                reader2 = csv.reader(csvfile)
+                valid_result = next(reader2)[0]
 
-            except Exception as e:
-                print(f"Error processing {filename}: {e}")
+            
+
+            if problem == '1':
+                value = list(map(int, data[0]))
+                weight = list(map(int, data[1]))
+                capacity = int(data[2][0])
+                result = greedy(value, weight, capacity)
+                print_result(result)
+                #print(f"Valid Output: {valid_result}")
+
+            elif problem == '2':
+                numbers = list(map(int, data[0]))
+                result = max_subarray_sum(numbers, 0, len(numbers) - 1)
+                print_result(result)
+                #print(f"Valid Output: {valid_result}")
+
+            elif problem == '3':
+                target = int(data[0][0])
+                coins = list(map(int, data[1]))
+                result = top_down(coins, target)
+                print_result(result)
+                #print(f"Valid Output: {valid_result}")
+
+            elif problem == '4':
+                value = list(map(int, data[0]))
+                weight = list(map(int, data[1]))
+                capacity = int(data[2][0])
+                result = knapsack(value, weight, capacity)
+                print_result(result)
+                #print(f"Valid Output: {valid_result}")
+
+
+        except Exception as e:
+            print(f"Error processing {filename}: {e}")
     return
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Run sorting algorithms on CSV files.")
+    parser.add_argument("-p", "--problem", help="Problem number to run (1-5)")
+    parser.add_argument("-f", "--file", help="Path to the CSV file")
+    parser.add_argument("-o", "--output", help="Path to the output file")
+    args = parser.parse_args()
 
+    
+    main(args.problem, args)
