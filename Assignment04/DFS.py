@@ -13,11 +13,17 @@ def build_adjacency_list(n, edges):
 def dfs(n, adj_list, start):
     visited = [False] * n
     result = []
-    queue = deque([start])
-    visited[start] = True
+    stack = [start]
     
-    while queue:
-        return
+    while stack:
+        vertex = stack.pop() # remove the last element from the stack
+        if not visited[vertex]: # if the current vertex has not been visited
+            visited[vertex] = True # Mark it as visited
+            result.append(vertex)  # and add it to the result list
+            for neighbor in reversed(adj_list[vertex]): # 
+                if not visited[neighbor]:
+                    stack.append(neighbor)
+    
     return result
 
 def read_graph_from_csv(file_path):
